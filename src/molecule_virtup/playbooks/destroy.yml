@@ -1,0 +1,48 @@
+---
+- name: Hypervisor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+      # Read driver defaults from an optional yaml file.
+      virtup_file: "{{ lookup('env', 'VIRTUP_FILE') | d('~/.virtup.yml', True) }}"
+      virtup_yml: "{{ lookup('file', virtup_file, errors='ignore') | d('{}', True) }}"
+      virtup_options: "{{ virtup_yml | from_yaml | combine(molecule_yml.driver.options) }}"
+  tasks:
+    - name: Driver options
+      debug:
+        var: virtup_options
+
+    - name: Add the hypervisor to the destroy inventory.
+      changed_when: false
+      add_host:
+        name: virtup_hypervisor
+        ansible_connection: "{{ virtup_options.connection | d('local') }}"
+        ansible_host: "{{ virtup_options.host | d('localhost') }}"
+        ansible_port: "{{ virtup_options.port | d(omit) }}"
+        ansible_python_interpreter: "{{ virtup_options.python_interpreter | d(omit) }}"
+
+- name: Destroy
+  hosts: virtup_hypervisor
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+      virtup_file: "{{ lookup('env', 'VIRTUP_FILE') | d('~/.virtup.yml', True) }}"
+      virtup_yml: "{{ lookup('file', virtup_file, errors='ignore') | d('{}', True) }}"
+      virtup_options: "{{ virtup_yml | from_yaml | combine(molecule_yml.driver.options) }}"
+  tasks:
+    # Workaround for ansible bug 14130.
+    - set_fact:
+        virtup_env:
+            MOLECULE_EPHEMERAL_DIRECTORY: "{{ molecule_ephemeral_directory }}"
+            LIBVIRT_DEFAULT_URI: "{{ virtup_options.libvirt_default_uri | d(omit) }}"
+
+    - name: Destroy molecule instance(s)
+      virt_up:
+        state: absent
+        name: "{{ item.name }}"
+        logfile: "{{ virtup_options.logfile | d(omit) }}"
+        loglevel: "{{ virtup_options.loglevel | d(omit) }}"
+      environment: "{{ virtup_env }}"
+      loop: "{{ molecule_yml.platforms }}"

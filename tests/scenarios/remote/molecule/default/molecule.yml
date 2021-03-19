@@ -1,0 +1,20 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: virtup
+  options:
+    host: mars.devlab.sinenomine.net
+    port: 22
+    connection: ssh
+    libvirt_default_uri: 'qemu:///system'
+platforms:
+  - name: instance01
+    template: generic-debian-10
+  - name: instance02
+    template: generic-debian-10
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_VERBOSITY: 1
+    ANSIBLE_STDOUT_CALLBACK: yaml

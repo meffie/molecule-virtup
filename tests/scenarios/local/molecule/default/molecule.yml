@@ -1,0 +1,15 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: virtup
+platforms:
+  - name: instance01
+    template: generic-debian-10
+  - name: instance02
+    template: generic-debian-10
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_VERBOSITY: 0
+    ANSIBLE_STDOUT_CALLBACK: yaml
