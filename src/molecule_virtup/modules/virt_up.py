@@ -156,7 +156,7 @@ def run_module():
             tinstance = virt_up.Instance.build(
                 module.params['template'],
                 template=module.params['template'],
-                prefix='TEMPLATE-',
+                prefix='VIRTUP-',
                 size=module.params['size'],
                 memory=module.params['memory'],
                 vcpus=module.params['cpus'])
