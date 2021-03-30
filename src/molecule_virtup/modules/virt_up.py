@@ -44,11 +44,6 @@ options:
     description: The os template name. See C(virt-up --list-templates). Required for state C(up).
     type: str
 
-  logfile:
-    description: Log file destination on hypervisor.
-    type: path
-    default: $HOME/.cache/virtup.log
-
 author:
   - Michael Meffie (@meffie)
 """
@@ -85,15 +80,16 @@ remote_identity_file:
   type: path
 """
 
-import logging
-import os
 import grp
+import logging
+import logging.handlers
+import os
 import pprint
 
 from ansible.module_utils.basic import AnsibleModule
-import virt_up
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('molecule-virtup')
+
 loglevels = {
     'critical': logging.CRITICAL,
     'error': logging.ERROR,
@@ -102,6 +98,19 @@ loglevels = {
     'info': logging.INFO,
     'debug': logging.DEBUG,
 }
+
+def setup_logging(loglevel):
+    level = loglevels.get(loglevel, logging.INFO)
+    fmt = '%(levelname)s %(name)s %(message)s'
+    address = '/dev/log'
+    if not os.path.exists(address):
+        address = ('localhost', 514)
+    facility = logging.handlers.SysLogHandler.LOG_USER
+    formatter = logging.Formatter(fmt)
+    handler = logging.handlers.SysLogHandler(address, facility)
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(level)
 
 def virtup_identity_file(instance):
     """

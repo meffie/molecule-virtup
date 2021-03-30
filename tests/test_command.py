@@ -43,12 +43,10 @@ def test_molecule_scenario(scenario_to_test):
         assert result.returncode == 0
 
 def test_molecule_external_options_file(tmp_path):
-    logfile = tmp_path / 'myfile.log'
     optionsfile = tmp_path / 'options.yml'
     options = {
         'connection': 'local',
         'host': 'localhost',
-        'logfile': str(logfile),
     }
     optionsfile.write_text(yaml.dump(options, explicit_start=True))
     env = os.environ.copy()
@@ -59,4 +57,3 @@ def test_molecule_external_options_file(tmp_path):
     with change_dir(testdir):
         result = run_command(['molecule', 'test'], env=env)
         assert result.returncode == 0
-        assert logfile.exists()

@@ -42,7 +42,6 @@
       virt_up:
         state: absent
         name: "{{ item.name }}"
-        logfile: "{{ virtup_options.logfile | d(omit) }}"
         loglevel: "{{ virtup_options.loglevel | d(omit) }}"
       environment: "{{ virtup_env }}"
       loop: "{{ molecule_yml.platforms }}"
