@@ -42,7 +42,8 @@
       virt_up:
         state: up
         name: "{{ item.name }}"
-        template: "{{ item.template }}"
+        # Fallback to vagrant "box" name if template not specified.
+        template: "{{ item.template | d(item.box | d('default')) }}"
         size: "{{ item.size | default(omit) }}"
         memory: "{{ item.memory | default(omit) }}"
         cpus: "{{ item.cpus | default(omit) }}"

@@ -7,7 +7,7 @@ platforms:
   - name: m-virtup-test-01
     template: generic/debian10
   - name: m-virtup-test-02
-    template: generic/debian10
+    box: generic/centos8
 provisioner:
   name: ansible
   env:
