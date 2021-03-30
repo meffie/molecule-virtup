@@ -104,14 +104,23 @@ loglevels = {
 }
 
 def virtup_identity_file(instance):
+    """
+    Get the ssh identity_file path on the virt_up system.
+    """
     return instance.meta['user']['ssh_identity']
 
 def molecule_identity_file(instance):
+    """
+    Determine the destination path to place the ssh identity_file on the controller.
+    """
     molecule_ephemeral_directory = os.environ['MOLECULE_EPHEMERAL_DIRECTORY']
     ssh_identity = os.path.basename(virtup_identity_file(instance))
     return os.path.join(molecule_ephemeral_directory, ssh_identity)
 
 def run_module():
+    """
+    Run the virt_up module to bring up or take down an instance with virt_up.
+    """
     result = dict(
         changed=False,
     )
@@ -123,47 +132,64 @@ def run_module():
             size=dict(type='str', default=None),
             memory=dict(type='int', default=None),
             cpus=dict(type='int', default=1),
-            logfile=dict(type='path', default='~/.cache/virtup.log'),
             loglevel=dict(type='str', choices=loglevels.keys(), default='info'),
         ),
         supports_check_mode=False,
     )
-    version = virt_up.__version__
+    setup_logging(module.params['loglevel'])
     name = module.params['name']
     state = module.params['state']
 
-    logfile = os.path.expanduser(module.params['logfile'])
-    if not os.path.exists(os.path.dirname(logfile)):
-        os.makedirs(os.path.dirname(logfile))
-    logging.basicConfig(
-        filename=logfile,
-        level=loglevels[module.params['loglevel']],
-        format='%(asctime)s %(levelname)s %(message)s')
-    log.info("Starting virt_up: version='%s', state='%s', name='%s', template='%s'",
-        version, state, name, module.params['template'])
+    # Die on errors.
+    def die(msg):
+        log.error(msg)
+        module.fail_json(msg=msg)
 
+    log.info("Starting virt_up: state='%s', name='%s', template='%s'",
+        state, name, module.params['template'])
+    log.debug('Parameters: %s', pprint.pformat(module.params))
+
+    # Import the virt_up module and check the version.
+    try:
+        import virt_up
+    except ImportError:
+        die('Failed to import virt_up module.')
+    log.info("virt_up version %s", virt_up.__version__)
+    major_version = int(virt_up.__version__.split('.')[0])
+    if major_version < 2:
+        die('virt_up package is too old. Please upgrade to 2.x')
+
+    # Warn if the libvirt env is not set.
     try:
         log.debug('LIBVIRT_DEFAULT_URI=%s', os.environ['LIBVIRT_DEFAULT_URI'])
     except KeyError:
         log.warning('LIBVIRT_DEFUALT_URI is not set!')
-    for g in os.getgroups():
-        log.debug('group: %d(%s)', g, grp.getgrgid(g).gr_name)
 
+    # Log groups membership.
+    group_names = []
+    for g in os.getgroups():
+        group_names.append(grp.getgrgid(g).gr_name)
+    log.debug('groups=%s' % (','.join(group_names)))
+    for group in ('libvirt',):
+        if not group in group_names:
+            log.warning("User is not a member of the '%s' group.", group)
+
+    # Bring up or take down our instance.
     if state == 'up':
         if virt_up.Instance.exists(name):
             instance = virt_up.Instance(name)
         else:
             tinstance = virt_up.Instance.build(
                 module.params['template'],
-                template=module.params['template'],
-                prefix='VIRTUP-',
                 size=module.params['size'],
                 memory=module.params['memory'],
-                vcpus=module.params['cpus'])
+                vcpus=module.params['cpus']
+            )
             instance = tinstance.clone(
                 name,
                 memory=module.params['memory'],
-                vcpus=module.params['cpus'])
+                vcpus=module.params['cpus'],
+            )
             result['changed'] = True
 
         instance.start()
@@ -190,7 +216,7 @@ def run_module():
             log.info("Instance '%s' was deleted.", name)
             result['changed'] = True
     else:
-        raise ValueError('Invalid state: %s' % state)
+        die('Invalid state: %s' % state)
 
     log.debug('result=%s', pprint.pformat(result))
     module.exit_json(**result)

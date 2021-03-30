@@ -9,10 +9,10 @@ driver:
     connection: ssh
     libvirt_default_uri: 'qemu:///system'
 platforms:
-  - name: instance01
-    template: generic-debian-10
-  - name: instance02
-    template: generic-debian-10
+  - name: m-virtup-test-01
+    template: generic/debian10
+  - name: m-virtup-test-02
+    template: generic/debian10
 provisioner:
   name: ansible
   env:
