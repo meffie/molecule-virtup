@@ -6,7 +6,7 @@
   no_log: "{{ molecule_no_log }}"
   vars:
       # Read driver defaults from an optional yaml file.
-      virtup_file: "{{ lookup('env', 'VIRTUP_FILE') | d('~/.virtup.yml', True) }}"
+      virtup_file: "{{ lookup('env', 'VIRTUP_OPTIONS_FILE') | d('~/.config/molecule-virtup.yml', True) }}"
       virtup_yml: "{{ lookup('file', virtup_file, errors='ignore') | d('{}', True) }}"
       virtup_options: "{{ virtup_yml | from_yaml | combine(molecule_yml.driver.options) }}"
   tasks:
@@ -28,7 +28,7 @@
   gather_facts: false
   no_log: "{{ molecule_no_log }}"
   vars:
-      virtup_file: "{{ lookup('env', 'VIRTUP_FILE') | d('~/.virtup.yml', True) }}"
+      virtup_file: "{{ lookup('env', 'VIRTUP_OPTIONS_FILE') | d('~/.config/molecule-virtup.yml', True) }}"
       virtup_yml: "{{ lookup('file', virtup_file, errors='ignore') | d('{}', True) }}"
       virtup_options: "{{ virtup_yml | from_yaml | combine(molecule_yml.driver.options) }}"
   tasks:

@@ -50,7 +50,7 @@ def test_molecule_external_options_file(tmp_path):
     }
     optionsfile.write_text(yaml.dump(options, explicit_start=True))
     env = os.environ.copy()
-    env['VIRTUP_FILE'] = str(optionsfile)
+    env['VIRTUP_OPTIONS_FILE'] = str(optionsfile)
 
     basedir = Path(__file__).resolve().parent
     testdir = basedir / 'scenarios' / 'local'
