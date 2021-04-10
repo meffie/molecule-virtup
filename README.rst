@@ -58,6 +58,16 @@ VIRTUP_OPTIONS_FILE
 
   Default: ``~/.config/molecule-virtup.yml``
 
+Example:
+
+.. code-block:: yaml
+
+    ---
+    connection: ssh
+    host: kvm.example.com
+    port: 22
+    libvirt_default_uri: "qemu:///session"
+
 Options
 =======
 
