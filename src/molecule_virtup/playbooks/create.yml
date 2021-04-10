@@ -21,6 +21,12 @@
         ansible_connection: "{{ virtup_options.connection | d('local') }}"
         ansible_host: "{{ virtup_options.host | d('localhost') }}"
         ansible_port: "{{ virtup_options.port | d(omit) }}"
+        ansible_user: "{{ virtup_options.user | d(omit) }}"
+        ansible_password: "{{ virtup_options.password | d(omit) }}"
+        ansible_ssh_private_key_file: "{{ virtup_options.ssh_private_key_file | d(omit) }}"
+        ansible_ssh_common_args: "{{ virtup_options.ssh_common_args | d(omit) }}"
+        ansible_ssh_pipelining: "{{ virtup_options.ssh_pipelining | d(omit) }}"
+        ansible_ssh_executable: "{{ virtup_options.ssh_executable | d(omit) }}"
         ansible_python_interpreter: "{{ virtup_options.python_interpreter | d(omit) }}"
 
 - name: Create

@@ -72,19 +72,24 @@ Options
 =======
 
 connection
-  The **ansible_connection** type to connect to the hypervisor; ``local`` or ``ssh``.
+  The **ansible_connection** type used when connecting to the hypervisor; ``local`` or ``ssh``.
 
   Default: local
 
 host
-  The **ansible_host** to connect to the hypervisor when the **connection** is ``local``.
+  The **ansible_host** used when connecting to the hypervisor.
 
   Default: localhost
 
 port
-  The **ansible_port** to connect to the hypervisor when the **connection** is ``local``.
+  The **ansible_port** used when connecting to the hypervisor.
 
   Default: 22
+
+user
+  The **ansible_user** used when connecting to the hypervisor.
+
+  Default: None
 
 loglevel
   The logging level name. Log messages are written to the syslog on the hypervisor.
@@ -100,13 +105,48 @@ python_interpreter
 libvirt_default_uri
   The libvirt local connection URI when the ``LIBVIRT_DEFAULT_URI`` environment
   variable is **not** present on the hypervisor for the ansible user. This URI should
-  be a local connection URI (e.g. not ssh). The connection URI is used by the
+  be a **local** connection URI, not ssh. The connection URI is used by the
   module running on the hypervisor to connect to the local libvirt daemon also
   running on the hypervisor.
 
   **virt_up** defaults to ``qemu:///session`` when the ``LIBVIRT_DEFAULT_URI``
   environment variable is not set on the hypervisor and the
   **libvirt_default_uri** option is not specified.
+
+  Default: None
+
+password
+  The **ansible_password** used when connecting to the hypervisor.
+
+  Default: None
+
+ssh_private_key_file
+  The **ansible_private_key_file** used when connecting to the hypervisor.
+  Private key file used by ssh. Useful if using multiple keys and you don’t want to use SSH agent.
+
+  Default: None
+
+ssh_common_args
+  The **ansible_ssh_common_args** used when connecting to the hypervisor.
+  This setting is always appended to the default command line ssh..
+
+  Default: None
+
+ssh_extra_args
+  The **ansible_ssh_extra_args** used when connecting to the hypervisor.
+  This setting is always appended to the default ssh command line.
+
+  Default: None
+
+ssh_pipelining
+  The **ansible_ssh_pipelining** used when connecting to the hypervisor.
+  Determines whether or not to use SSH pipelining.
+
+  Default: None
+
+ssh_executable
+  The **ansible_ssh_executable** used when connecting to the hypervisor.
+  Overrides the ssh command to be used.
 
   Default: None
 
