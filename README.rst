@@ -41,6 +41,8 @@ variables in your ``molecule.yml``. Here is a example using the
         port: 22
         python_interpreter: "/usr/bin/python3"
         libvirt_default_uri: "qemu:///session"
+        config_home: "~/.config/virt-up"
+        data_home: "~/.local/share/virt-up"
 
    platforms:
      - name: instance
@@ -96,6 +98,12 @@ loglevel
   Specify one of: critical, error, warning, warn, info, debug
 
   Default: info
+
+config_home
+  Specifies the ``virt_up`` configuration directory path.
+
+data_home
+  Specifies the ``virt_up`` data directory path.
 
 python_interpreter
   Specifies the **ansible_python_interpreter** on the hypervisor.

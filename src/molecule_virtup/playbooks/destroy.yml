@@ -38,11 +38,14 @@
       virtup_yml: "{{ lookup('file', virtup_file, errors='ignore') | d('{}', True) }}"
       virtup_options: "{{ virtup_yml | from_yaml | combine(molecule_yml.driver.options) }}"
   tasks:
-    # Workaround for ansible bug 14130.
+    # This separate task is a workaround for ansible bug 14130.
+    # 'omit' is only supported for module parameters.
     - set_fact:
         virtup_env:
             MOLECULE_EPHEMERAL_DIRECTORY: "{{ molecule_ephemeral_directory }}"
             LIBVIRT_DEFAULT_URI: "{{ virtup_options.libvirt_default_uri | d(omit) }}"
+            VIRTUP_CONFIG_HOME: "{{ virtup_options.config_home | d(omit) }}"
+            VIRTUP_DATA_HOME: "{{ virtup_options.data_home | d(omit) }}"
 
     - name: Destroy molecule instance(s)
       virt_up:
