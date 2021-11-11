@@ -85,6 +85,7 @@ import logging
 import logging.handlers
 import os
 import pprint
+import sys
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -162,8 +163,11 @@ def run_module():
     try:
         import virt_up
     except ImportError:
-        die('Failed to import virt_up module.')
+        die('Failed to import virt_up module.\nPython: %s\n: uid: %d' % (sys.version, os.getuid()))
     log.info("virt_up version %s", virt_up.__version__)
+    log.info('virtup_config_home %s', virt_up.instance.virtup_config_home)
+    log.info('virtup_data_home %s', virt_up.instance.virtup_data_home)
+
     major_version = int(virt_up.__version__.split('.')[0])
     if major_version < 2:
         die('virt_up package is too old. Please upgrade to 2.x')
